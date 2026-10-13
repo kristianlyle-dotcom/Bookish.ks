@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookish.ks</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+
+    <div class="page-shell">
+
+      <header class="topbar">
+        <h1>Bookish.ks</h1>
+      </header>
+
+      <section class="hero">
+        <h3>Discover which page to flip, stranger!</h3>
+      </section>
+
+      <section class="search-panel">
+        <div class="search-row">
+          <label for="book-search">Looking for something?</label>
+          <div class="search-controls">
+            <input id="book-search" type="text" placeholder="Enter a book title..." />
+            <button onclick="fetchBookData()">Look for this!</button>
+          </div>
+        </div>
+
+        <div class="results-card">
+          <div class="results-copy">
+            <h4 id="book-title"></h4>
+            <p id="book-author"></p>
+            <p id="book-year"></p>
+            <p id="book-description"></p>
+          </div>
+          <div>
+            <img id="book-cover" src="" style="display:none" />
+          </div>
+          
+        </div>
+      </section>
+
+      <h5>You might dig these!</h5>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
