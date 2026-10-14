@@ -2,7 +2,7 @@
 function fetchBookDescription(isbnValue) {
     const url = `https://openlibrary.org/isbn/${isbnValue}.json`;
 
-   return fetch(url)
+    return fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error: ${response.status}`);
@@ -19,7 +19,7 @@ function fetchBookDescription(isbnValue) {
                     : bookData.description.value;
 
                 console.log("Description:", description);
-                return description;
+                return description || "No description available.";
             } 
             
             else if (bookData.works?.[0]?.key) {
@@ -34,10 +34,10 @@ function fetchBookDescription(isbnValue) {
                             : workData.description?.value;
 
                         console.log("Description:", description || "No description available.");
-                        return description;
+                        return description || "No description available.";
                     });
             } else {
-                return console.log("No description available.");
+                return "No description available";
             }
         })
         .catch(error => console.error("Description request failed:", error));
@@ -55,30 +55,62 @@ function fetchBookData() {
       return response.json();
     })
     .then(data => {
-      console.log("results" + data.docs);
-      console.log("results length" + data.docs.length);
-      console.log("first result: " + data.docs[0].title);
-      console.log("first result author: " + data.docs[0].author_name);
-      console.log("first result year: " + data.docs[0].first_publish_year);
+        const bookResults = document.getElementById('book-results');
+        bookResults.innerHTML = ""; 
+        data.docs.slice(0,10).forEach((book) =>{
 
-      const isbn = data.docs[0].isbn?.[0];
-      console.log(isbn)
-      
+            console.log("first result: " + book.title);
+            console.log("first result author: " + book.author_name);
+            console.log("first result year: " + book.first_publish_year);
 
-      fetchBookDescription(isbn).then(bookDescription => {
-          console.log("bookDescription:", bookDescription);
-          document.getElementById('book-description').textContent = bookDescription;
-      });
-      document.getElementById('book-title').textContent = data.docs[0].title;
-      document.getElementById('book-author').textContent = data.docs[0].author_name;
-      document.getElementById('book-year').textContent = data.docs[0].first_publish_year;
-      document.getElementById('book-cover').src = `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-M.jpg`;
-      document.getElementById('book-cover').alt = `Cover of ${data.docs[0].title}`;
-      document.getElementById('book-cover').style.display = 'block';
+            const isbn = book.isbn?.[0];
+            console.log(isbn)
 
+            const bookCard = document.createElement('div');
+            bookCard.classList.add('result-body');
+            const bookInfo = document.createElement('div');
+            bookInfo.classList.add('book-info');
+            const title = document.createElement('h5');
+            title.classList.add('book-title');
+            title.textContent = book.title;
+            const author = document.createElement('h5');
+            author.classList.add('book-author');
+            author.textContent = book.author_name?.join(', ') || 'Unknown author';
+            const year = document.createElement('h5');
+            year.classList.add('book-year');
+            year.textContent = book.first_publish_year;
+
+            bookInfo.append(title, author, year);
+
+            const description = document.createElement('p');
+            description.classList.add('book-description');
+            const cover = document.createElement('div');
+            cover.classList.add('book-cover');
+
+            bookCard.append(bookInfo, description, cover);
+            bookResults.appendChild(bookCard);
+            
+            if (isbn) {
+                fetchBookDescription(isbn).then(bookDescription => {
+                    description.textContent = bookDescription;
+                });
+            } else {
+                description.textContent = "No ISBN available.";
+            }
+            
+            if (book.cover_i) {
+                const img = document.createElement('img');
+                img.src = `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
+                cover.appendChild(img);
+            } else {
+                cover.textContent = 'No cover available';
+            }
+            
+        })
     })
     .catch(error => {
       console.error("Request failed:", error);
+      alert("Unable to connect to Open Library. Please try again.");
     });
 
 }
