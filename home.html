@@ -23,12 +23,18 @@
           <label for="book-search">Looking for something?</label>
           <div class="search-controls">
             <input id="book-search" type="text" placeholder="Enter a book title..." />
-            <button onclick="fetchBookData()">Look for this!</button>
+            <button onclick="searchBooks();">Look for this!</button>
           </div>
         </div>
 
         <div class="results-card">
             <div id="book-results"> Search for your favorite book! </div>
+        </div>
+
+        <div class="pagination">
+          <button id="prev-page" onclick="changePage(-1)"> ← </button>
+          <span id="page-number">Page 1</span>
+          <button id="next-page" onclick="changePage(1)"> → </button>
         </div>
 
       </section>

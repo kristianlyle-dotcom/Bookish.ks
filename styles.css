@@ -161,3 +161,25 @@ h5 {
 .book-cover img{
   width: 100%;
 }
+
+.pagination {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 16px;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#page-number {
+    color: var(--text);
+    font-weight: 600;
+}

@@ -1,3 +1,5 @@
+let currentPage;
+let lastItem;
 
 function fetchBookDescription(isbnValue) {
     const url = `https://openlibrary.org/isbn/${isbnValue}.json`;
@@ -10,7 +12,6 @@ function fetchBookDescription(isbnValue) {
             return response.json();
         })
         .then(bookData => {
-            console.log("ISBN edition details:", bookData);
 
             // Try the edition's description first.
             if (bookData.description) {
@@ -18,7 +19,6 @@ function fetchBookDescription(isbnValue) {
                     ? bookData.description
                     : bookData.description.value;
 
-                console.log("Description:", description);
                 return description || "No description available.";
             } 
             
@@ -33,7 +33,6 @@ function fetchBookDescription(isbnValue) {
                             ? workData.description
                             : workData.description?.value;
 
-                        console.log("Description:", description || "No description available.");
                         return description || "No description available.";
                     });
             } else {
@@ -43,7 +42,7 @@ function fetchBookDescription(isbnValue) {
         .catch(error => console.error("Description request failed:", error));
 }
 
-function fetchBookData() {
+function fetchBookData(startItem,endItem) {
 
   const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(document.getElementById('book-search').value)}&fields=title,author_name,first_publish_year,cover_i,isbn&limit=100`;
 
@@ -55,16 +54,18 @@ function fetchBookData() {
       return response.json();
     })
     .then(data => {
+
         const bookResults = document.getElementById('book-results');
         bookResults.innerHTML = ""; 
-        data.docs.slice(0,10).forEach((book) =>{
 
-            console.log("first result: " + book.title);
-            console.log("first result author: " + book.author_name);
-            console.log("first result year: " + book.first_publish_year);
+        const resultSize = data.docs.length;
+        lastItem = resultSize;
+
+        maintainPagination(startItem, endItem);
+
+        data.docs.slice(startItem,endItem).forEach((book) =>{
 
             const isbn = book.isbn?.[0];
-            console.log(isbn)
 
             const bookCard = document.createElement('div');
             bookCard.classList.add('result-body');
@@ -112,5 +113,41 @@ function fetchBookData() {
       console.error("Request failed:", error);
       alert("Unable to connect to Open Library. Please try again.");
     });
+}
 
+function maintainPagination(startItem,  endItem){
+
+    console.log("End item:", endItem);
+    console.log("Last item:", lastItem);
+
+    document.querySelector('.pagination').style.display = 'flex';
+
+    if(startItem === 0){
+        document.getElementById('prev-page').disabled = true;
+    } else {
+        document.getElementById('prev-page').disabled = false;
+    }
+
+    if(endItem >= lastItem){ 
+        document.getElementById('next-page').disabled = true;
+    }
+    else{
+        document.getElementById('next-page').disabled = false;
+    }
+}
+
+function changePage(pageChange) {
+
+    const pageNumber = document.getElementById('page-number');
+    currentPage += pageChange;
+    console.log("currentPage:" + currentPage);
+    pageNumber.textContent = `Page ${currentPage}`;
+
+    fetchBookData((currentPage - 1) * 10, currentPage * 10);
+}
+
+function searchBooks(){
+    currentPage = 1;
+    document.getElementById('page-number').textContent = "Page 1";
+    fetchBookData(0, 10);
 }
